@@ -10,15 +10,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 var TodoItem = require('../models/TodoItem.js');
 
 app.post('/add', (req, res) => {
-
     const newTodo = new TodoItem({
-        task: req.body.taskText,
+        task: req.body.task,
         completed: req.body.completed
     });
 
     newTodo.save()
       .then(response => {
-        console.log("sent POST successfully")
+        console.log("Todo added successfully")
       })
       .catch(error => {
         res.send(error);

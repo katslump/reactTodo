@@ -2562,12 +2562,7 @@ var TodoApp = function (_React$Component) {
   function TodoApp(props) {
     _classCallCheck(this, TodoApp);
 
-    var _this = _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
-
-    _this.state = {
-      todos: []
-    };
-    return _this;
+    return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
   }
 
   _createClass(TodoApp, [{
@@ -2603,9 +2598,7 @@ var TodoList = function (_React$Component2) {
     value: function componentWillMount() {
       var self = this;
       _axios2.default.get(dbUrl + '/all').then(function (response) {
-        self.setState({
-          todos: response.data.todos
-        });
+        self.setState({ todos: response.data.todos });
       }).catch(function (error) {
         console.log(error);
       });
@@ -2615,7 +2608,7 @@ var TodoList = function (_React$Component2) {
     value: function removeTodo(task) {
       var allTodos = this.state.todos;
       var obj = allTodos.find(function (o) {
-        return o.taskText === task.taskText;
+        return o.task === task.task;
       });
       var indexOfTodo = allTodos.indexOf(obj);
       allTodos.splice(indexOfTodo, 1);
@@ -2642,14 +2635,24 @@ var TodoList = function (_React$Component2) {
     value: function toggleTodo(task) {
       var allTodos = this.state.todos;
       var obj = allTodos.find(function (o) {
-        return o.taskText === task.taskText;
+        return o.task === task.task;
       });
       var indexOfTodo = allTodos.indexOf(obj);
       obj.completed = !obj.completed;
       allTodos.splice(indexOfTodo, 1, obj);
-      this.setState({
-        todos: allTodos
-      }, function () {});
+      var self = this;
+
+      _axios2.default.post(dbUrl + '/toggle', {
+        task: task,
+        completed: !obj.completed
+      }).then(function (response) {
+        console.log("response important: " + response);
+        self.setState({
+          todos: allTodos
+        }, function () {});
+      }).catch(function (error) {
+        console.log(error);
+      });
     }
   }, {
     key: 'render',

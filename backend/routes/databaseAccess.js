@@ -24,6 +24,16 @@ app.post('/add', (req, res) => {
       })
 });
 
+app.post('/toggle', (req, res) => {
+    TodoItem.findOneAndUpdate({task: req.body.task.task}, {$set:{completed:!req.body.task.completed}}, function(err, doc) {
+        if(err) {
+            console.log(err);
+        } else {
+            res.send(doc);
+        }
+    });
+});
+
 
 app.get('/all', (req, res) => {
     TodoItem.find()

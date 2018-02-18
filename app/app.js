@@ -7,9 +7,6 @@ const dbUrl = "http://localhost:3000/db";
 class TodoApp extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      todos: []
-    };
   }
 
   render() {
@@ -28,20 +25,17 @@ class TodoList extends React.Component {
   }
 
   componentWillMount() {
-      let self = this;
-      axios.get(dbUrl + '/all').then(function(response) {
-        self.setState({
-          todos: response.data.todos
-        });
-      }).catch(function(error) {
-        console.log(error);
-      });
-
+    let self = this;
+    axios.get(dbUrl + '/all').then(function(response) {
+      self.setState({todos: response.data.todos});
+    }).catch(function(error) {
+      console.log(error);
+    });
   }
 
   removeTodo(task) {
     let allTodos = this.state.todos;
-    var obj = allTodos.find(o => o.taskText === task.taskText);
+    var obj = allTodos.find(o => o.task === task.task);
     var indexOfTodo = allTodos.indexOf(obj);
     allTodos.splice(indexOfTodo, 1);
     this.setState({
@@ -64,13 +58,24 @@ class TodoList extends React.Component {
 
   toggleTodo(task) {
     let allTodos = this.state.todos;
-    var obj = allTodos.find(o => o.taskText === task.taskText);
+    var obj = allTodos.find(o => o.task === task.task);
     var indexOfTodo = allTodos.indexOf(obj);
     obj.completed = !(obj.completed);
     allTodos.splice(indexOfTodo, 1, obj);
-    this.setState({
-      todos: allTodos
-    }, function() {});
+    var self = this;
+
+    axios.post(dbUrl + '/toggle', {
+      task: task,
+      completed: !(obj.completed)
+    }).then(function(response) {
+      console.log("response important: " + response);
+      self.setState({
+        todos: allTodos
+      }, function() {});
+    }).catch(function(error) {
+      console.log(error);
+    });
+
   }
 
   render() {

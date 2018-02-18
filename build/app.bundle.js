@@ -989,6 +989,8 @@ if (process.env.NODE_ENV === 'production') {
 "use strict";
 
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _react = __webpack_require__(4);
 
 var _react2 = _interopRequireDefault(_react);
@@ -999,11 +1001,222 @@ var _reactDom2 = _interopRequireDefault(_reactDom);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_reactDom2.default.render(_react2.default.createElement(
-  'p',
-  null,
-  'React is live!'
-), document.getElementById('root'));
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var dummyData = [{
+  taskText: "Catch 'em all",
+  completed: true
+}, {
+  taskText: "Clean my room",
+  completed: false
+}, {
+  taskText: "Call mom",
+  completed: false
+}];
+var key = 0;
+
+var TodoApp = function (_React$Component) {
+  _inherits(TodoApp, _React$Component);
+
+  function TodoApp(props) {
+    _classCallCheck(this, TodoApp);
+
+    return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
+  }
+
+  _createClass(TodoApp, [{
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(TodoList, null)
+      );
+    }
+  }]);
+
+  return TodoApp;
+}(_react2.default.Component);
+
+var TodoList = function (_React$Component2) {
+  _inherits(TodoList, _React$Component2);
+
+  function TodoList(props) {
+    _classCallCheck(this, TodoList);
+
+    var _this2 = _possibleConstructorReturn(this, (TodoList.__proto__ || Object.getPrototypeOf(TodoList)).call(this, props));
+
+    _this2.state = {
+      items: dummyData
+    };
+    return _this2;
+  }
+
+  _createClass(TodoList, [{
+    key: 'removeTodo',
+    value: function removeTodo(task) {
+      var allTodos = this.state.items;
+      var obj = allTodos.find(function (o) {
+        return o.taskText === task.taskText;
+      });
+      var indexOfTodo = allTodos.indexOf(obj);
+      allTodos.splice(indexOfTodo, 1);
+      this.setState({
+        items: allTodos
+      }, function () {});
+    }
+  }, {
+    key: 'addTodo',
+    value: function addTodo(task) {
+      var allTodos = this.state.items.slice();
+      allTodos.push({ taskText: task, completed: false });
+      this.setState({
+        items: allTodos
+      }, function () {});
+    }
+  }, {
+    key: 'toggleTodo',
+    value: function toggleTodo(task) {
+      var allTodos = this.state.items;
+      var obj = allTodos.find(function (o) {
+        return o.taskText === task.taskText;
+      });
+      var indexOfTodo = allTodos.indexOf(obj);
+      obj.completed = !obj.completed;
+      allTodos.splice(indexOfTodo, 1, obj);
+      this.setState({
+        items: allTodos
+      }, function () {});
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(InputLine, { tasks: this.state.items, onSubmit: function onSubmit(task) {
+            return _this3.addTodo(task);
+          } }),
+        _react2.default.createElement(
+          'ul',
+          null,
+          this.state.items.map(function (item) {
+            return _react2.default.createElement(Todo, { key: key++, task: item, onToggle: function onToggle() {
+                return _this3.toggleTodo(item);
+              }, onSwitch: function onSwitch() {
+                return _this3.removeTodo(item);
+              } });
+          })
+        )
+      );
+    }
+  }]);
+
+  return TodoList;
+}(_react2.default.Component);
+
+var Todo = function (_React$Component3) {
+  _inherits(Todo, _React$Component3);
+
+  function Todo(props) {
+    _classCallCheck(this, Todo);
+
+    var _this4 = _possibleConstructorReturn(this, (Todo.__proto__ || Object.getPrototypeOf(Todo)).call(this, props));
+
+    _this4.state = {};
+    return _this4;
+  }
+
+  _createClass(Todo, [{
+    key: 'render',
+    value: function render() {
+      var _this5 = this;
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'li',
+          { style: this.props.task.completed ? {
+              'textDecoration': 'line-through'
+            } : {
+              color: 'black'
+            } },
+          _react2.default.createElement('input', { type: 'submit', value: 'X', onClick: function onClick(task) {
+              return _this5.props.onSwitch(task);
+            } }),
+          _react2.default.createElement(
+            'span',
+            { onClick: function onClick() {
+                return _this5.props.onToggle(_this5.props.task);
+              } },
+            this.props.task.taskText
+          )
+        )
+      );
+    }
+  }]);
+
+  return Todo;
+}(_react2.default.Component);
+
+var InputLine = function (_React$Component4) {
+  _inherits(InputLine, _React$Component4);
+
+  function InputLine(props) {
+    _classCallCheck(this, InputLine);
+
+    var _this6 = _possibleConstructorReturn(this, (InputLine.__proto__ || Object.getPrototypeOf(InputLine)).call(this, props));
+
+    _this6.state = {
+      task: ''
+    };
+    return _this6;
+  }
+
+  _createClass(InputLine, [{
+    key: 'addNewTodo',
+    value: function addNewTodo(e) {
+      e.preventDefault();
+      this.props.onSubmit(this.state.task);
+    }
+  }, {
+    key: 'handleTodoChange',
+    value: function handleTodoChange(e) {
+      this.setState({ task: e.target.value });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this7 = this;
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(
+          'form',
+          { onSubmit: function onSubmit(e) {
+              return _this7.addNewTodo(e);
+            } },
+          _react2.default.createElement('input', { type: 'text', placeholder: 'task', onChange: function onChange(e) {
+              return _this7.handleTodoChange(e);
+            }, value: this.state.task }),
+          _react2.default.createElement('input', { type: 'submit', value: 'Add todo' })
+        )
+      );
+    }
+  }]);
+
+  return InputLine;
+}(_react2.default.Component);
+
+_reactDom2.default.render(_react2.default.createElement(TodoApp, null), document.getElementById('root'));
 
 /***/ }),
 /* 16 */

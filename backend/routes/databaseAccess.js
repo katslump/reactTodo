@@ -24,4 +24,16 @@ app.post('/add', (req, res) => {
       })
 });
 
+
+app.get('/all', (req, res) => {
+    TodoItem.find()
+    .catch(error => {
+        res.send(error);
+    })
+    .then(response => {
+         res.send({todos: response});
+    })
+});
+
+
 module.exports = app;

@@ -7,10 +7,10 @@ const dbUrl = "http://localhost:3000/db";
 class TodoApp extends React.Component {
   constructor(props) {
     super(props);
-
+    this.state = {
+      todos: []
+    };
   }
-
-  componentDidMount() {}
 
   render() {
     return (<div>
@@ -25,6 +25,18 @@ class TodoList extends React.Component {
     this.state = {
       todos: []
     };
+  }
+
+  componentWillMount() {
+      let self = this;
+      axios.get(dbUrl + '/all').then(function(response) {
+        self.setState({
+          todos: response.data.todos
+        });
+      }).catch(function(error) {
+        console.log(error);
+      });
+
   }
 
   removeTodo(task) {
@@ -42,7 +54,6 @@ class TodoList extends React.Component {
       task: task,
       completed: false
     }).then(function(response) {
-      console.log(response);
       this.setState({
         todos: this.state.todos.concat(response.data)
       });
@@ -88,7 +99,7 @@ class Todo extends React.Component {
             color: 'black'
           }}>
         <input type="submit" value="X" onClick={(task) => this.props.onSwitch(task)}/>
-        <span onClick={() => this.props.onToggle(this.props.task)}>{this.props.task.taskText}</span>
+        <span onClick={() => this.props.onToggle(this.props.task)}>{this.props.task.task}</span>
       </li>
     </div>);
   }

@@ -2553,18 +2553,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var dbUrl = "http://localhost:3000/db";
 var key = 0;
-
-
-var instance = _axios2.default.create({
-  baseURL: dbUrl,
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  }
-});
+var dbUrl = "http://localhost:3000/db";
 
 var TodoApp = function (_React$Component) {
   _inherits(TodoApp, _React$Component);
@@ -2572,13 +2562,15 @@ var TodoApp = function (_React$Component) {
   function TodoApp(props) {
     _classCallCheck(this, TodoApp);
 
-    return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
+
+    _this.state = {
+      todos: []
+    };
+    return _this;
   }
 
   _createClass(TodoApp, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {}
-  }, {
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
@@ -2607,6 +2599,18 @@ var TodoList = function (_React$Component2) {
   }
 
   _createClass(TodoList, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      var self = this;
+      _axios2.default.get(dbUrl + '/all').then(function (response) {
+        self.setState({
+          todos: response.data.todos
+        });
+      }).catch(function (error) {
+        console.log(error);
+      });
+    }
+  }, {
     key: 'removeTodo',
     value: function removeTodo(task) {
       var allTodos = this.state.todos;
@@ -2622,10 +2626,13 @@ var TodoList = function (_React$Component2) {
   }, {
     key: 'addTodo',
     value: function addTodo(task) {
-      instance.post('/add', { task: task,
-        completed: false }).then(function (response) {
-        console.log(response);
-        this.setState({ todos: this.state.todos.concat(response.data) });
+      _axios2.default.post(dbUrl + '/add', {
+        task: task,
+        completed: false
+      }).then(function (response) {
+        this.setState({
+          todos: this.state.todos.concat(response.data)
+        });
       }).catch(function (error) {
         console.log(error);
       });
@@ -2708,7 +2715,7 @@ var Todo = function (_React$Component3) {
             { onClick: function onClick() {
                 return _this5.props.onToggle(_this5.props.task);
               } },
-            this.props.task.taskText
+            this.props.task.task
           )
         )
       );

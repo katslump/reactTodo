@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+const dbUrl = "http://localhost:3000/db";
 
 let dummyData = [
   {
@@ -45,11 +46,17 @@ class TodoList extends React.Component {
   }
 
   addTodo(task) {
-    let allTodos = this.state.items.slice();
-    allTodos.push({taskText: task, completed: false});
-    this.setState({
-      items: allTodos
-    }, function() {});
+
+        axios.post(dbUrl + '/add',
+        {task: task.taskText,
+        completed: false})
+          .then(function (response) {
+            console.log(response);
+            this.setState({ items: this.state.items.concat(response.data)});
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
   }
 
   toggleTodo(task) {

@@ -1,21 +1,24 @@
 const express = require('express');
 const router = express.Router();
+var bodyParser = require('body-parser');
 
 var app = express();
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 var TodoItem = require('../models/TodoItem.js');
 
-app.get('/add', (req, res) => {
+app.post('/add', (req, res) => {
 
-    const testTodo = new TodoItem({
-        task: "test task",
-        completed: false
+    const newTodo = new TodoItem({
+        task: req.body.taskText,
+        completed: req.body.completed
     });
 
-    testTodo.save()
+    newTodo.save()
       .then(response => {
-        res.send(response);
+        console.log("sent POST successfully")
       })
       .catch(error => {
         res.send(error);

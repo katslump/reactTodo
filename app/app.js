@@ -52,11 +52,22 @@ class TodoList extends React.Component {
     }, function() {});
   }
 
+  toggleTodo(task) {
+      let allTodos = this.state.items;
+      var obj = allTodos.find(o => o.taskText === task.taskText);
+      var indexOfTodo = allTodos.indexOf(obj);
+      obj.completed =  !(obj.completed);
+      allTodos.splice(indexOfTodo, 1, obj);
+      this.setState({
+        items: allTodos
+      }, function() {});
+  }
+
   render() {
     return (<div>
       <InputLine tasks={this.state.items} onSubmit={(task) => this.addTodo(task)}/>
       <ul>
-        {this.state.items.map((item) => <Todo key={key++} task={item} onSwitch={() => this.removeTodo(item)}/>)}
+        {this.state.items.map((item) => <Todo key={key++} task={item} onToggle={() => this.toggleTodo(item)} onSwitch={() => this.removeTodo(item)}/>)}
       </ul>
     </div>);
   }
@@ -76,8 +87,8 @@ class Todo extends React.Component {
           }
           : {
             color: 'black'
-          }}>
-        <input type="submit" value="X" onClick={(task) => this.props.onSwitch(task)}/>{this.props.task.taskText}
+        }}>
+        <input type="submit" value="X" onClick={(task) => this.props.onSwitch(task)}/><span onClick={()=> this.props.onToggle(this.props.task)}>{this.props.task.taskText}</span>
       </li>
     </div>);
   }

@@ -1,14 +1,27 @@
+// The following web app (TodoApp) contains a list (TodoList) of items (TodoItems) to be completed
+// A user can add a new todo via the textbox and submit button on the page
+// A user can toggle a todo item to "complete" or "incomplete" by clicking on the individual todo item
+// A user can delete a todo item by clicking the "X" button to its left
+
+
+// Importing needed npm packages
 import React from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
+
+// Key variable to keep key count on TodoItem's
 let key = 0;
+
+// Database URL needed for AJAX requests
 const dbUrl = "http://localhost:3000/db";
+
 
 class TodoApp extends React.Component {
   constructor(props) {
     super(props);
   }
 
+  // Renders the TodoApp component
   render() {
     return (<div>
       <TodoList/>
@@ -24,6 +37,9 @@ class TodoList extends React.Component {
     };
   }
 
+  // Performs AJAX request that gets all todos in the DB
+  // before component loads on the page.
+  // Sets todos state on success, errors otherwise
   componentWillMount() {
     let self = this;
     axios.get(dbUrl + '/all').then(function(response) {
@@ -33,42 +49,52 @@ class TodoList extends React.Component {
     });
   }
 
+  // Removes a todo from the list when the X button is clicked
+  // Performs removal via an AJAX request containing the todo id
+  // Sets todos state on success, errors otherwise
   removeTodo(task) {
-    let allTodos = this.state.todos;
-    var obj = allTodos.find(o => o.task === task.task);
-    var indexOfTodo = allTodos.indexOf(obj);
-    allTodos.splice(indexOfTodo, 1);
-    this.setState({
-      todos: allTodos
-    }, function() {});
-  }
-
-  addTodo(task) {
-    axios.post(dbUrl + '/add', {
-      task: task,
-      completed: false
-    }).then(function(response) {
-      this.setState({
-        todos: this.state.todos.concat(response.data)
-      });
+    let self = this;
+    axios.post(dbUrl + '/remove', {id: task._id}).then(function(response) {
+      let allTodos = self.state.todos;
+      var obj = allTodos.find(o => o.task === task.task);
+      var indexOfTodo = allTodos.indexOf(obj);
+      allTodos.splice(indexOfTodo, 1);
+      self.setState({
+        todos: allTodos
+      }, function() {});
     }).catch(function(error) {
       console.log(error);
     });
   }
 
-  toggleTodo(task) {
-    let allTodos = this.state.todos;
-    var obj = allTodos.find(o => o.task === task.task);
-    var indexOfTodo = allTodos.indexOf(obj);
-    obj.completed = !(obj.completed);
-    allTodos.splice(indexOfTodo, 1, obj);
-    var self = this;
-
-    axios.post(dbUrl + '/toggle', {
+  // Adds a todo from the list when a new todo is entered in the input line and submit is pressed
+  // Performs addition via an AJAX request containing the todo task and completion attribute
+  addTodo(task) {
+    let self = this;
+    axios.post(dbUrl + '/add', {
       task: task,
+      completed: false
+    }).then(function(response) {
+      self.setState({todos: self.state.todos.concat(response)});
+    }).catch(function(error) {
+      console.log(error);
+    });
+  }
+
+  // Toggles todo "complete" or "not complete" on click
+  // Performs an AJAX request to update the todo in the DB
+  // Sets todos state on success, errors otherwise
+  toggleTodo(task) {
+    var self = this;
+    axios.post(dbUrl + '/toggle', {
+      id: task._id,
       completed: !(obj.completed)
     }).then(function(response) {
-      console.log("response important: " + response);
+      let allTodos = this.state.todos;
+      var obj = allTodos.find(o => o.task === task.task);
+      var indexOfTodo = allTodos.indexOf(obj);
+      obj.completed = !(obj.completed);
+      allTodos.splice(indexOfTodo, 1, obj);
       self.setState({
         todos: allTodos
       }, function() {});
@@ -78,22 +104,24 @@ class TodoList extends React.Component {
 
   }
 
+  // Renders TodoList element
   render() {
     return (<div>
       <InputLine tasks={this.state.todos} onSubmit={(task) => this.addTodo(task)}/>
       <ul>
-        {this.state.todos.map((item) => <Todo key={key++} task={item} onToggle={() => this.toggleTodo(item)} onSwitch={() => this.removeTodo(item)}/>)}
+        {this.state.todos.map((item) => <TodoItem key={key++} task={item} onToggle={() => this.toggleTodo(item)} onSwitch={() => this.removeTodo(item)}/>)}
       </ul>
     </div>);
   }
 }
 
-class Todo extends React.Component {
+class TodoItem extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
   }
 
+  // Renders TodoItem component
   render() {
     return (<div>
       <li style={this.props.task.completed
@@ -118,15 +146,18 @@ class InputLine extends React.Component {
     };
   }
 
+  // Runs when button X is clicked for a given TodoItem
   addNewTodo(e) {
     e.preventDefault();
     this.props.onSubmit(this.state.task);
   }
 
+  // Runs when TodoItem is clicked (or toggled)
   handleTodoChange(e) {
     this.setState({task: e.target.value});
   }
 
+  // Renders TodoItem component
   render() {
     return (<div>
       <form onSubmit={(e) => this.addNewTodo(e)}>
@@ -137,4 +168,5 @@ class InputLine extends React.Component {
   }
 }
 
+// Renders TodoApp component in the DOM
 ReactDOM.render(<TodoApp/>, document.getElementById('root'));

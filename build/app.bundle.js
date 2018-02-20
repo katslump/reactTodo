@@ -2606,25 +2606,32 @@ var TodoList = function (_React$Component2) {
   }, {
     key: 'removeTodo',
     value: function removeTodo(task) {
-      var allTodos = this.state.todos;
-      var obj = allTodos.find(function (o) {
-        return o.task === task.task;
+      var self = this;
+      _axios2.default.post(dbUrl + '/remove', { id: task._id }).then(function (response) {
+        var allTodos = self.state.todos;
+        var obj = allTodos.find(function (o) {
+          return o.task === task.task;
+        });
+        var indexOfTodo = allTodos.indexOf(obj);
+        allTodos.splice(indexOfTodo, 1);
+        self.setState({
+          todos: allTodos
+        }, function () {});
+      }).catch(function (error) {
+        console.log(error);
       });
-      var indexOfTodo = allTodos.indexOf(obj);
-      allTodos.splice(indexOfTodo, 1);
-      this.setState({
-        todos: allTodos
-      }, function () {});
     }
   }, {
     key: 'addTodo',
     value: function addTodo(task) {
+      var self = this;
       _axios2.default.post(dbUrl + '/add', {
         task: task,
         completed: false
       }).then(function (response) {
-        this.setState({
-          todos: this.state.todos.concat(response.data)
+        var allTodos = self.state.todos;
+        self.setState({
+          todos: allTodos.concat(response)
         });
       }).catch(function (error) {
         console.log(error);
@@ -2633,20 +2640,19 @@ var TodoList = function (_React$Component2) {
   }, {
     key: 'toggleTodo',
     value: function toggleTodo(task) {
-      var allTodos = this.state.todos;
-      var obj = allTodos.find(function (o) {
-        return o.task === task.task;
-      });
-      var indexOfTodo = allTodos.indexOf(obj);
-      obj.completed = !obj.completed;
-      allTodos.splice(indexOfTodo, 1, obj);
       var self = this;
 
       _axios2.default.post(dbUrl + '/toggle', {
-        task: task,
+        id: task._id,
         completed: !obj.completed
       }).then(function (response) {
-        console.log("response important: " + response);
+        var allTodos = this.state.todos;
+        var obj = allTodos.find(function (o) {
+          return o.task === task.task;
+        });
+        var indexOfTodo = allTodos.indexOf(obj);
+        obj.completed = !obj.completed;
+        allTodos.splice(indexOfTodo, 1, obj);
         self.setState({
           todos: allTodos
         }, function () {});

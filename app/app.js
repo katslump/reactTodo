@@ -89,9 +89,9 @@ class TodoList extends React.Component {
     var self = this;
     axios.post(dbUrl + '/toggle', {
       id: task._id,
-      completed: !(obj.completed)
+      completed: !(task.completed)
     }).then(function(response) {
-      let allTodos = this.state.todos;
+      let allTodos = self.state.todos;
       var obj = allTodos.find(o => o.task === task.task);
       var indexOfTodo = allTodos.indexOf(obj);
       obj.completed = !(obj.completed);

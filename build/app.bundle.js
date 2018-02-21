@@ -2670,12 +2670,13 @@ var TodoList = function (_React$Component2) {
   }, {
     key: 'toggleTodo',
     value: function toggleTodo(task) {
+      console.log(task);
       var self = this;
       _axios2.default.post(dbUrl + '/toggle', {
         id: task._id,
-        completed: !obj.completed
+        completed: !task.completed
       }).then(function (response) {
-        var allTodos = this.state.todos;
+        var allTodos = self.state.todos;
         var obj = allTodos.find(function (o) {
           return o.task === task.task;
         });

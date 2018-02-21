@@ -2551,9 +2551,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // The following web app (TodoApp) contains a list (TodoList) of items (TodoItems) to be completed
+// A user can add a new todo via the textbox and submit button on the page
+// A user can toggle a todo item to "complete" or "incomplete" by clicking on the individual todo item
+// A user can delete a todo item by clicking the "X" button to its left
 
+
+// Importing needed npm packages
+
+
+// Key variable to keep key count on TodoItem's
 var key = 0;
+
+// Database URL needed for AJAX requests
 var dbUrl = "http://localhost:3000/db";
 
 var TodoApp = function (_React$Component) {
@@ -2565,12 +2575,15 @@ var TodoApp = function (_React$Component) {
     return _possibleConstructorReturn(this, (TodoApp.__proto__ || Object.getPrototypeOf(TodoApp)).call(this, props));
   }
 
+  // Renders the TodoApp component
+
+
   _createClass(TodoApp, [{
     key: 'render',
     value: function render() {
       return _react2.default.createElement(
         'div',
-        null,
+        { className: 'form-group' },
         _react2.default.createElement(TodoList, null)
       );
     }
@@ -2593,6 +2606,11 @@ var TodoList = function (_React$Component2) {
     return _this2;
   }
 
+  // Performs AJAX request that gets all todos in the DB
+  // before component loads on the page.
+  // Sets todos state on success, errors otherwise
+
+
   _createClass(TodoList, [{
     key: 'componentWillMount',
     value: function componentWillMount() {
@@ -2603,6 +2621,11 @@ var TodoList = function (_React$Component2) {
         console.log(error);
       });
     }
+
+    // Removes a todo from the list when the X button is clicked
+    // Performs removal via an AJAX request containing the todo id
+    // Sets todos state on success, errors otherwise
+
   }, {
     key: 'removeTodo',
     value: function removeTodo(task) {
@@ -2621,6 +2644,10 @@ var TodoList = function (_React$Component2) {
         console.log(error);
       });
     }
+
+    // Adds a todo from the list when a new todo is entered in the input line and submit is pressed
+    // Performs addition via an AJAX request containing the todo task and completion attribute
+
   }, {
     key: 'addTodo',
     value: function addTodo(task) {
@@ -2629,19 +2656,20 @@ var TodoList = function (_React$Component2) {
         task: task,
         completed: false
       }).then(function (response) {
-        var allTodos = self.state.todos;
-        self.setState({
-          todos: allTodos.concat(response)
-        });
+        self.setState({ todos: self.state.todos.concat(response.data) });
       }).catch(function (error) {
         console.log(error);
       });
     }
+
+    // Toggles todo "complete" or "not complete" on click
+    // Performs an AJAX request to update the todo in the DB
+    // Sets todos state on success, errors otherwise
+
   }, {
     key: 'toggleTodo',
     value: function toggleTodo(task) {
       var self = this;
-
       _axios2.default.post(dbUrl + '/toggle', {
         id: task._id,
         completed: !obj.completed
@@ -2660,6 +2688,9 @@ var TodoList = function (_React$Component2) {
         console.log(error);
       });
     }
+
+    // Renders TodoList element
+
   }, {
     key: 'render',
     value: function render() {
@@ -2667,15 +2698,15 @@ var TodoList = function (_React$Component2) {
 
       return _react2.default.createElement(
         'div',
-        null,
+        { className: 'panel' },
         _react2.default.createElement(InputLine, { tasks: this.state.todos, onSubmit: function onSubmit(task) {
             return _this3.addTodo(task);
           } }),
         _react2.default.createElement(
           'ul',
-          null,
+          { className: 'list-group' },
           this.state.todos.map(function (item) {
-            return _react2.default.createElement(Todo, { key: key++, task: item, onToggle: function onToggle() {
+            return _react2.default.createElement(TodoItem, { key: key++, task: item, onToggle: function onToggle() {
                 return _this3.toggleTodo(item);
               }, onSwitch: function onSwitch() {
                 return _this3.removeTodo(item);
@@ -2689,49 +2720,60 @@ var TodoList = function (_React$Component2) {
   return TodoList;
 }(_react2.default.Component);
 
-var Todo = function (_React$Component3) {
-  _inherits(Todo, _React$Component3);
+var TodoItem = function (_React$Component3) {
+  _inherits(TodoItem, _React$Component3);
 
-  function Todo(props) {
-    _classCallCheck(this, Todo);
+  function TodoItem(props) {
+    _classCallCheck(this, TodoItem);
 
-    var _this4 = _possibleConstructorReturn(this, (Todo.__proto__ || Object.getPrototypeOf(Todo)).call(this, props));
+    var _this4 = _possibleConstructorReturn(this, (TodoItem.__proto__ || Object.getPrototypeOf(TodoItem)).call(this, props));
 
     _this4.state = {};
     return _this4;
   }
 
-  _createClass(Todo, [{
+  // Renders TodoItem component
+
+
+  _createClass(TodoItem, [{
     key: 'render',
     value: function render() {
       var _this5 = this;
 
       return _react2.default.createElement(
-        'div',
-        null,
+        'li',
+        { className: 'list-group-item', style: this.props.task.completed ? {
+            'textDecoration': 'line-through'
+          } : {
+            color: 'black'
+          } },
         _react2.default.createElement(
-          'li',
-          { style: this.props.task.completed ? {
-              'textDecoration': 'line-through'
-            } : {
-              color: 'black'
+          'div',
+          { className: 'col-xs-9 col-md-9', onClick: function onClick() {
+              return _this5.props.onToggle(_this5.props.task);
             } },
-          _react2.default.createElement('input', { type: 'submit', value: 'X', onClick: function onClick(task) {
-              return _this5.props.onSwitch(task);
-            } }),
+          this.props.task.task
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'col-xs-3 col-md-3' },
           _react2.default.createElement(
-            'span',
-            { onClick: function onClick() {
-                return _this5.props.onToggle(_this5.props.task);
+            'button',
+            { type: 'button', className: 'close', onClick: function onClick(task) {
+                return _this5.props.onSwitch(task);
               } },
-            this.props.task.task
+            _react2.default.createElement(
+              'span',
+              { 'aria-hidden': 'true' },
+              '\xD7'
+            )
           )
         )
       );
     }
   }]);
 
-  return Todo;
+  return TodoItem;
 }(_react2.default.Component);
 
 var InputLine = function (_React$Component4) {
@@ -2748,41 +2790,49 @@ var InputLine = function (_React$Component4) {
     return _this6;
   }
 
+  // Runs when button X is clicked for a given TodoItem
+
+
   _createClass(InputLine, [{
     key: 'addNewTodo',
     value: function addNewTodo(e) {
       e.preventDefault();
       this.props.onSubmit(this.state.task);
     }
+
+    // Runs when TodoItem is clicked (or toggled)
+
   }, {
     key: 'handleTodoChange',
     value: function handleTodoChange(e) {
       this.setState({ task: e.target.value });
     }
+
+    // Renders TodoItem component
+
   }, {
     key: 'render',
     value: function render() {
       var _this7 = this;
 
       return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(
-          'form',
-          { onSubmit: function onSubmit(e) {
-              return _this7.addNewTodo(e);
-            } },
-          _react2.default.createElement('input', { type: 'text', placeholder: 'task', onChange: function onChange(e) {
-              return _this7.handleTodoChange(e);
-            }, value: this.state.task }),
-          _react2.default.createElement('input', { type: 'submit', value: 'Add todo' })
-        )
+        'form',
+        { onSubmit: function onSubmit(e) {
+            return _this7.addNewTodo(e);
+          } },
+        _react2.default.createElement('input', { type: 'text', placeholder: 'task', onChange: function onChange(e) {
+            return _this7.handleTodoChange(e);
+          }, value: this.state.task }),
+        _react2.default.createElement('input', { type: 'submit', className: 'btn btn btn-primary', value: 'Add todo' })
       );
     }
   }]);
 
   return InputLine;
 }(_react2.default.Component);
+
+// Renders TodoApp component in the DOM
+
 
 _reactDom2.default.render(_react2.default.createElement(TodoApp, null), document.getElementById('root'));
 

@@ -23,7 +23,7 @@ class TodoApp extends React.Component {
 
   // Renders the TodoApp component
   render() {
-    return (<div>
+    return (<div className="form-group">
       <TodoList/>
     </div>);
   }
@@ -75,7 +75,7 @@ class TodoList extends React.Component {
       task: task,
       completed: false
     }).then(function(response) {
-      self.setState({todos: self.state.todos.concat(response)});
+      self.setState({ todos: self.state.todos.concat(response.data)});
     }).catch(function(error) {
       console.log(error);
     });
@@ -106,12 +106,12 @@ class TodoList extends React.Component {
 
   // Renders TodoList element
   render() {
-    return (<div>
+    return (<div className="panel">
       <InputLine tasks={this.state.todos} onSubmit={(task) => this.addTodo(task)}/>
-      <ul>
+      <ul className="list-group">
         {this.state.todos.map((item) => <TodoItem key={key++} task={item} onToggle={() => this.toggleTodo(item)} onSwitch={() => this.removeTodo(item)}/>)}
-      </ul>
-    </div>);
+    </ul></div>
+    );
   }
 }
 
@@ -123,18 +123,18 @@ class TodoItem extends React.Component {
 
   // Renders TodoItem component
   render() {
-    return (<div>
-      <li style={this.props.task.completed
+    return (
+      <li className="list-group-item" style={this.props.task.completed
           ? {
             'textDecoration': 'line-through'
           }
           : {
             color: 'black'
           }}>
-        <input type="submit" value="X" onClick={(task) => this.props.onSwitch(task)}/>
-        <span onClick={() => this.props.onToggle(this.props.task)}>{this.props.task.task}</span>
+        <div className="col-xs-9 col-md-9" onClick={() => this.props.onToggle(this.props.task)}>{this.props.task.task}</div>
+        <div className="col-xs-3 col-md-3"><button type="button" className="close" onClick={(task) => this.props.onSwitch(task)}><span aria-hidden="true">&times;</span></button></div>
       </li>
-    </div>);
+    );
   }
 }
 
@@ -159,12 +159,12 @@ class InputLine extends React.Component {
 
   // Renders TodoItem component
   render() {
-    return (<div>
+    return (
       <form onSubmit={(e) => this.addNewTodo(e)}>
         <input type="text" placeholder="task" onChange={(e) => this.handleTodoChange(e)} value={this.state.task}/>
-        <input type="submit" value="Add todo"/>
+        <input type="submit" className="btn btn btn-primary" value="Add todo"/>
       </form>
-    </div>);
+    );
   }
 }
 

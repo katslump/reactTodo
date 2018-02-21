@@ -2629,6 +2629,7 @@ var TodoList = function (_React$Component2) {
   }, {
     key: 'removeTodo',
     value: function removeTodo(task) {
+      console.log(task);
       var self = this;
       _axios2.default.post(dbUrl + '/remove', { id: task._id }).then(function (response) {
         var allTodos = self.state.todos;

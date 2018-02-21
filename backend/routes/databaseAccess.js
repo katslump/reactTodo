@@ -42,7 +42,7 @@ app.post('/toggle', (req, res) => {
 
 // Enables the end user to remove a todo item from the database
 app.post('/remove', (req, res) => {
-  TodoItem.remove({_id: req.body.id}).then(response => {
+  TodoItem.findOneAndRemove({_id: req.body.id}).then(response => {
     res.send(response);
   }).catch(error => {
     res.send(error);

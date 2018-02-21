@@ -53,6 +53,7 @@ class TodoList extends React.Component {
   // Performs removal via an AJAX request containing the todo id
   // Sets todos state on success, errors otherwise
   removeTodo(task) {
+      console.log(task);
     let self = this;
     axios.post(dbUrl + '/remove', {id: task._id}).then(function(response) {
       let allTodos = self.state.todos;
